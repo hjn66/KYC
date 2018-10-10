@@ -1,0 +1,39 @@
+{{define "title"}}ورود{{end}}
+
+{{define "body"}}
+<h1>Register</h1>
+
+{{ if .Response }}
+{{ if .Success }}
+<div class="alert alert-success" role="alert">
+    {{ .Message }}
+</div>
+{{ else }}
+<div class="alert alert-danger" role="alert">
+    Error {{.Message }}
+</div>
+{{ end }}
+{{ end }}
+
+<form enctype="multipart/form-data" class="form-inline" action="login.html" method="post">
+    <div class="form-group">
+        <label for="nationalIDValue">National ID</label>
+        <input type="text" class="form-control" id="nationalIDValue" placeholder="world" name="nationalID" required>
+    </div>
+    <div class="form-group">
+        <label for="firstnameValue">First Name</label>
+        <input type="text" class="form-control" id="firstnameValue" placeholder="world" name="firstname" required>
+    </div>
+    <div class="form-group">
+        <label for="lastNameValue">Last Name</label>
+        <input type="text" class="form-control" id="lastNameValue" placeholder="world" name="lastName" required>
+    </div>
+    <div class="form-group">
+        <label for="nonceValue">nonce: {{ .Nonce }}</label>
+    </div>
+    <input type="hidden" name="submitted" value="true">
+    <button type="submit" class="btn btn-default">Send the request</button>
+</form>
+
+<a href="home.html">Back to Home</a>
+{{end}}

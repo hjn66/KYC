@@ -1,0 +1,18 @@
+{{define "title"}}Home{{end}}
+
+{{define "body"}}
+<div class="container">
+
+</div>
+<h1>Home</h1>
+
+<pre>
+    نام: {{.FirstName}}
+    نام خانوادگی: {{.LastName}}
+    تاریخ تولد: {{.BirthDate}}
+    PublicKey: {{.PublicKey}}
+    {{.QRpng}}
+</pre>
+
+<a href="request.html">Change the Hello value</a>
+{{end}}

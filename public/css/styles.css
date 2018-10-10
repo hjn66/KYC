@@ -1,0 +1,43 @@
+main.container {
+     margin-bottom: 100px;
+}
+
+nav .navbar-brand>img {
+     display: inline-block;
+     height: 100%;
+     margin-left: 10px;
+}
+
+.form-group {
+     width: 100%;
+     margin-bottom: 5px !important;
+}
+
+.hidden {
+     display: none;
+}
+
+.green {
+     color: green;
+}
+
+.red {
+     color: red;
+}
+
+img.red {
+     border: 5px solid red;
+}
+
+img.green {
+     border: 5px solid green;
+}
+
+main div {
+     margin: auto;
+     width: 50%;
+     text-align: center;
+     font-size: 45;
+     font-family: fantasy;
+     padding: 10px;
+}

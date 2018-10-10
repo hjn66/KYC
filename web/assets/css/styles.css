@@ -1,0 +1,15 @@
+main.container {
+    margin-bottom: 100px;
+}
+
+nav .navbar-brand > img {
+    display: inline-block;
+    height: 100%;
+    margin-left: 10px;
+}
+
+.form-group {
+	width : 100%;
+	margin-bottom: 5px !important;
+}
+
