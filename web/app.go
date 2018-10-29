@@ -3,9 +3,12 @@ package web
 import (
 	"fmt"
 
-	"github.com/chainHero/heroes-service/kyc-webservice/kyc"
-	"github.com/chainHero/heroes-service/kyc-webservice/webservice"
-	"github.com/chainHero/heroes-service/web/controllers"
+	"KYC/kyc-webservice/kyc"
+
+	"KYC/kyc-webservice/webservice"
+
+	"KYC/web/controllers"
+
 	"github.com/go-martini/martini"
 )
 

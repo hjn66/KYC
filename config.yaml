@@ -8,78 +8,76 @@ version: 1.0.0
 # The client section used by GO SDK.
 #
 client:
-
   # Which organization does this application instance belong to? The value must be the name of an org
   # defined under "organizations"
   organization: org1
-
 
   logging:
     level: info
 
   # Global configuration for peer, event service and orderer timeouts
   # if this this section is omitted, then default values will be used (same values as below)
-#  peer:
-#    timeout:
-#      connection: 10s
-#      response: 180s
-#      discovery:
-#        # Expiry period for discovery service greylist filter
-#        # The channel client will greylist peers that are found to be offline
-#        # to prevent re-selecting them in subsequent retries.
-#        # This interval will define how long a peer is greylisted
-#        greylistExpiry: 10s
-#  eventService:
-#    # Event service type (optional). If not specified then the type is automatically
-#    # determined from channel capabilities.
-#    type: (deliver|eventhub)
-    # the below timeouts are commented out to use the default values that are found in
-    # "pkg/fab/endpointconfig.go"
-    # the client is free to override the default values by uncommenting and resetting
-    # the values as they see fit in their config file
-#    timeout:
-#      connection: 15s
-#      registrationResponse: 15s
-#  orderer:
-#    timeout:
-#      connection: 15s
-#      response: 15s
-#  global:
-#    timeout:
-#      query: 180s
-#      execute: 180s
-#      resmgmt: 180s
-#    cache:
-#      connectionIdle: 30s
-#      eventServiceIdle: 2m
-#      channelConfig: 30m
-#      channelMembership: 30s
-#      discovery: 10s
-#      selection: 10m
+  #  peer:
+  #    timeout:
+  #      connection: 10s
+  #      response: 180s
+  #      discovery:
+  #        # Expiry period for discovery service greylist filter
+  #        # The channel client will greylist peers that are found to be offline
+  #        # to prevent re-selecting them in subsequent retries.
+  #        # This interval will define how long a peer is greylisted
+  #        greylistExpiry: 10s
+  #  eventService:
+  #    # Event service type (optional). If not specified then the type is automatically
+  #    # determined from channel capabilities.
+  #    type: (deliver|eventhub)
+  # the below timeouts are commented out to use the default values that are found in
+  # "pkg/fab/endpointconfig.go"
+  # the client is free to override the default values by uncommenting and resetting
+  # the values as they see fit in their config file
+  #    timeout:
+  #      connection: 15s
+  #      registrationResponse: 15s
+  #  orderer:
+  #    timeout:
+  #      connection: 15s
+  #      response: 15s
+  #  global:
+  #    timeout:
+  #      query: 180s
+  #      execute: 180s
+  #      resmgmt: 180s
+  #    cache:
+  #      connectionIdle: 30s
+  #      eventServiceIdle: 2m
+  #      channelConfig: 30m
+  #      channelMembership: 30s
+  #      discovery: 10s
+  #      selection: 10m
 
   # Root of the MSP directories with keys and certs.
   cryptoconfig:
-    path: ${GOPATH}/src/github.com/chainHero/heroes-service/fixtures/crypto-config
+    path: ${GOPATH}/src/KYC/fixtures/crypto-config
 
   # Some SDKs support pluggable KV stores, the properties under "credentialStore"
   # are implementation specific
   credentialStore:
-    path: /tmp/heroes-service-store
+    path: /tmp/KYC-store
 
     # [Optional]. Specific to the CryptoSuite implementation used by GO SDK. Software-based implementations
     # requiring a key store. PKCS#11 based implementations does not.
     cryptoStore:
-      path: /tmp/heroes-service-msp
+      path: /tmp/KYC-msp
 
-   # BCCSP config for the client. Used by GO SDK.
+    # BCCSP config for the client. Used by GO SDK.
   BCCSP:
     security:
-     enabled: true
-     default:
-      provider: "SW"
-     hashAlgorithm: "SHA2"
-     softVerify: true
-     level: 256
+      enabled: true
+      default:
+        provider: "SW"
+      hashAlgorithm: "SHA2"
+      softVerify: true
+      level: 256
 
   tlsCerts:
     # [Optional]. Use system certificate pool when connecting to peers, orderers (for negotiating TLS) Default: false
@@ -87,8 +85,8 @@ client:
 
     # [Optional]. Client key and cert for TLS handshake with peers and orderers
     client:
-      keyfile:
-      certfile:
+      ? keyfile
+      ? certfile
 
 #
 # [Optional]. But most apps would have this section so that channel objects can be constructed
@@ -128,7 +126,7 @@ channels:
         # Default: true
         eventSource: true
 
-      peer1.org1.hf.chainhero.io:
+      ? peer1.org1.hf.chainhero.io
 
     policies:
       #[Optional] options for retrieving channel configuration blocks
@@ -147,7 +145,6 @@ channels:
           maxBackoff: 5s
           #[Optional] he factor by which the initial back off period is exponentially incremented
           backoffFactor: 2.0
-
 
 #
 # list of participating organizations in this network
@@ -193,7 +190,7 @@ orderers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/chainHero/heroes-service/fixtures/crypto-config/ordererOrganizations/hf.chainhero.io/tlsca/tlsca.hf.chainhero.io-cert.pem
+      path: ${GOPATH}/src/KYC/fixtures/crypto-config/ordererOrganizations/hf.chainhero.io/tlsca/tlsca.hf.chainhero.io-cert.pem
 #
 # List of peers to send various requests to, including endorsement, query
 # and event listener registration.
@@ -219,7 +216,7 @@ peers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/chainHero/heroes-service/fixtures/crypto-config/peerOrganizations/org1.hf.chainhero.io/tlsca/tlsca.org1.hf.chainhero.io-cert.pem
+      path: ${GOPATH}/src/KYC/fixtures/crypto-config/peerOrganizations/org1.hf.chainhero.io/tlsca/tlsca.org1.hf.chainhero.io-cert.pem
 
   peer1.org1.hf.chainhero.io:
     # this URL is used to send endorsement and query requests
@@ -241,8 +238,7 @@ peers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/chainHero/heroes-service/fixtures/crypto-config/peerOrganizations/org1.hf.chainhero.io/tlsca/tlsca.org1.hf.chainhero.io-cert.pem
-
+      path: ${GOPATH}/src/KYC/fixtures/crypto-config/peerOrganizations/org1.hf.chainhero.io/tlsca/tlsca.org1.hf.chainhero.io-cert.pem
 
 #
 # Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows
@@ -263,7 +259,7 @@ certificateAuthorities:
     caName: ca.org1.hf.chainhero.io
     tlsCACerts:
       # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/chainHero/heroes-service/fixtures/crypto-config/peerOrganizations/org1.hf.chainhero.io/ca/ca.org1.hf.chainhero.io-cert.pem
+      path: ${GOPATH}/src/KYC/fixtures/crypto-config/peerOrganizations/org1.hf.chainhero.io/ca/ca.org1.hf.chainhero.io-cert.pem
 
 entityMatchers:
   peer:

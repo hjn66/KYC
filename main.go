@@ -1,12 +1,11 @@
 package main
 
 import (
+	"KYC/blockchain"
+	"KYC/web"
+	"KYC/web/controllers"
 	"fmt"
 	"os"
-
-	"github.com/chainHero/heroes-service/blockchain"
-	"github.com/chainHero/heroes-service/web"
-	"github.com/chainHero/heroes-service/web/controllers"
 )
 
 func main() {
@@ -17,12 +16,13 @@ func main() {
 
 		// Channel parameters
 		ChannelID:     "chainhero",
-		ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/chainHero/heroes-service/fixtures/artifacts/chainhero.channel.tx",
+		ChannelConfig: os.Getenv("GOPATH") + "/src/KYC/fixtures/artifacts/chainhero.channel.tx",
 
 		// Chaincode parameters
-		ChainCodeID:     "heroes-service",
+		// TODO
+		ChainCodeID:     "KYC",
 		ChaincodeGoPath: os.Getenv("GOPATH"),
-		ChaincodePath:   "github.com/chainHero/heroes-service/chaincode/",
+		ChaincodePath:   "KYC/chaincode/",
 		OrgAdmin:        "Admin",
 		OrgName:         "org1",
 		ConfigFile:      "config.yaml",

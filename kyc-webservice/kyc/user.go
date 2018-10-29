@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/chainHero/heroes-service/web/controllers"
+	"KYC/web/controllers"
 )
 
 // GuestBookEntry represents a single entry in a Guest Book. It contains the

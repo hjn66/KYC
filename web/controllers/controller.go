@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/chainHero/heroes-service/blockchain"
+	"KYC/blockchain"
 )
 
 type User struct {

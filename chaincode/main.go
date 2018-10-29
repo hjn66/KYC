@@ -30,6 +30,7 @@ func (t *HeroesServiceChaincode) Init(stub shim.ChaincodeStubInterface) pb.Respo
 	function, _ := stub.GetFunctionAndParameters()
 
 	// Check if the request is the init function
+	fmt.Println("init", function)
 	if function != "init" {
 		return shim.Error("Unknown function call")
 	}
