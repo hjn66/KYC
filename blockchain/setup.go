@@ -113,9 +113,6 @@ func (setup *FabricSetup) InstallAndInstantiateCC() error {
 
 	// Set up chaincode policy
 	ccPolicy := cauthdsl.SignedByAnyMember([]string{"org1.hf.chainhero.io"})
-	fmt.Println(setup.ChannelID)
-	fmt.Println(setup.ChainCodeID)
-	fmt.Println(setup.ChaincodeGoPath)
 	resp, err := setup.admin.InstantiateCC(setup.ChannelID, resmgmt.InstantiateCCRequest{Name: setup.ChainCodeID, Path: setup.ChaincodeGoPath, Version: "0", Args: [][]byte{[]byte("init")}, Policy: ccPolicy})
 	if err != nil || resp.TransactionID == "" {
 		return errors.WithMessage(err, "failed to instantiate the chaincode")

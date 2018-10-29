@@ -1,17 +1,3 @@
-// Copyright 2013 Bruno Albuquerque (bga@bug-br.org.br).
-//
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not
-// use this file except in compliance with the License. You may obtain a copy of
-// the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations under
-// the License.
-
 // WebService related methods.
 
 package kyc
@@ -86,7 +72,7 @@ func (conf *Conf) WebGetLogins(params martini.Params, req *http.Request) (int, s
 	return http.StatusOK, "{}"
 }
 
-// WebGet implements webservice.WebGet.
+// GetTicketQR implements webservice.GetTicketQR.
 func (conf *Conf) GetTicketQR(params martini.Params) (int, string) {
 	letterRunes := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
 	nonce := make([]rune, 10)
@@ -122,7 +108,6 @@ func (conf *Conf) GetTicketQR(params martini.Params) (int, string) {
 	var png []byte
 	png, err = qrcode.Encode(string(encodedData), qrcode.High, 512)
 	template, err := ioutil.ReadFile("getticket.html")
-	// png, err = ioutil.ReadFile("/home/hojjat/Desktop/111.png")
 	html := string(template)
 	html = strings.Replace(html, "{QRIMAGE}", base64.StdEncoding.EncodeToString(png), 1)
 	html = strings.Replace(html, "{TICKET}", data.T, 1)
@@ -136,7 +121,6 @@ func (conf *Conf) GetTicketPost(params martini.Params,
 
 	// Make sure Body is closed when we are done.
 	defer req.Body.Close()
-	// req.
 	// Read request body.
 	requestBody, err := ioutil.ReadAll(req.Body)
 	fmt.Println("requestBody: " + string(requestBody))
@@ -192,7 +176,6 @@ func (conf *Conf) RegisterUserPost(params martini.Params,
 
 	// Read request body.
 	requestBody, err := ioutil.ReadAll(req.Body)
-	// fmt.Println("requestBody: " + string(requestBody))
 
 	if err != nil {
 		return http.StatusInternalServerError, "Internal error"
