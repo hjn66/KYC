@@ -132,7 +132,7 @@ func (conf *Conf) GetTicketQR(params martini.Params) (int, string) {
 	}{
 		T: base64.StdEncoding.EncodeToString(encrypted),
 		N: string(nonce),
-		O: "Melli Bank",
+		O: "Ansar Bank",
 		F: "FLI",
 	}
 	encodedData, err := json.Marshal(data)
