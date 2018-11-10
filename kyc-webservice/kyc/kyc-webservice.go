@@ -24,7 +24,7 @@ import (
 )
 
 // WebGet implements webservice.WebGet.
-func (conf *Conf) WebGet(params martini.Params) (int, string) {
+func (conf *Conf) WebGetUsers(params martini.Params) (int, string) {
 	if len(params) == 0 {
 		// No params. Return entire collection encoded as JSON.
 		encodedEntries, err := conf.app.Fabric.QueryRange("1000", "2000")
@@ -33,9 +33,34 @@ func (conf *Conf) WebGet(params martini.Params) (int, string) {
 			// Failed encoding collection.
 			return http.StatusInternalServerError, "internal error"
 		}
+		var blockchainData []BlockChainDate
+		err = json.Unmarshal(encodedEntries, &blockchainData)
+
+		// fmt.Println(users[0].GUID)
+		// fmt.Println(users[0].Record.FirstName)
+		userHtml := ""
+		for _, blockchainRecord := range blockchainData {
+			userHtml += "<div class='user'> GUID =" + blockchainRecord.GUID
+			userHtml += "<div class='record'> NationalID: " + blockchainRecord.Record.NationalID + "</div>"
+			userHtml += "<div class='record'> FirstName: " + blockchainRecord.Record.FirstName + "</div>"
+			userHtml += "<div class='record'> LastName: " + blockchainRecord.Record.LastName + "</div>"
+			userHtml += "<div class='record'> BirthDate: " + blockchainRecord.Record.BirthDate + "</div>"
+			userHtml += "<div class='record'> Photo: " + blockchainRecord.Record.Photo + "</div>"
+			userHtml += "</div>"
+		}
+		// fmt.Println(encodedEntries)
+
+		// dataJson := `["1","2","3"]`
+		// var arr []string
+		// _ = json.Unmarshal([]byte(dataJson), &arr)
+		// log.Printf("Unmarshaled: %v", arr)
+		// fmt.Println(arr)
 
 		// Return encoded entries.
-		return http.StatusOK, string(encodedEntries)
+		template, err := ioutil.ReadFile("public/users.html")
+		html := string(template)
+		html = strings.Replace(html, "{USERS}", userHtml, 1)
+		return http.StatusOK, html
 	}
 	return 0, ""
 }
@@ -70,6 +95,13 @@ func (conf *Conf) WebGetLogins(params martini.Params, req *http.Request) (int, s
 		}
 	}
 	return http.StatusOK, "{}"
+}
+
+// HomeGet implements webservice.HomeGet.
+func (conf *Conf) HomeGet(params martini.Params) (int, string) {
+	template, _ := ioutil.ReadFile("public/home.html")
+	html := string(template)
+	return http.StatusOK, html
 }
 
 // GetTicketQR implements webservice.GetTicketQR.
@@ -107,7 +139,7 @@ func (conf *Conf) GetTicketQR(params martini.Params) (int, string) {
 
 	var png []byte
 	png, err = qrcode.Encode(string(encodedData), qrcode.High, 512)
-	template, err := ioutil.ReadFile("getticket.html")
+	template, err := ioutil.ReadFile("public/getticket.html")
 	html := string(template)
 	html = strings.Replace(html, "{QRIMAGE}", base64.StdEncoding.EncodeToString(png), 1)
 	html = strings.Replace(html, "{TICKET}", data.T, 1)

@@ -2,6 +2,23 @@ main.container {
      margin-bottom: 100px;
 }
 
+div.user {
+     border: 2px solid green;
+     margin: 10px;
+}
+
+div.user, div.record {
+     font-size: 14px;
+     font-weight: normal;
+     text-align: left;
+     width: 100%;
+     font-family: monospace;
+}
+
+div.record {
+     padding: 0;
+}
+
 nav .navbar-brand>img {
      display: inline-block;
      height: 100%;
@@ -25,12 +42,23 @@ nav .navbar-brand>img {
      color: red;
 }
 
+main #Image {
+     width: 300px;
+}
+
+main #ticket {
+     word-wrap: break-word;
+     width: 70%;
+     margin: 0 30% 30 0;
+     border: 2px solid blue;
+}
+
 img.red {
-     border: 5px solid red;
+     border: 10px solid red;
 }
 
 img.green {
-     border: 5px solid green;
+     border: 10px solid green;
 }
 
 main div {

@@ -22,7 +22,18 @@ type Ticket struct {
 	Nounce     string
 	GUID       int
 }
-
+type BlockChainRecord struct {
+	NationalID string
+	FirstName  string
+	LastName   string
+	BirthDate  string
+	Photo      string
+	PublicKey  string
+}
+type BlockChainDate struct {
+	GUID   string
+	Record BlockChainRecord
+}
 type QRTicket struct {
 	Expiration string
 	Nounce     string

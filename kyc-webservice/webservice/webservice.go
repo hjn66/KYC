@@ -16,7 +16,8 @@ type WebService interface {
 	LoginPost(params martini.Params, req *http.Request) (int, string)
 	CheckFieldPost(params martini.Params, req *http.Request) (int, string)
 
-	WebGet(params martini.Params) (int, string)
+	HomeGet(params martini.Params) (int, string)
+	WebGetUsers(params martini.Params) (int, string)
 	WebGetLogins(params martini.Params, req *http.Request) (int, string)
 }
 
@@ -25,7 +26,8 @@ type WebService interface {
 func RegisterWebService(webService WebService,
 	classicMartini *martini.ClassicMartini) {
 
-	classicMartini.Get("/users", webService.WebGet)
+	classicMartini.Get("/", webService.HomeGet)
+	classicMartini.Get("/users", webService.WebGetUsers)
 	classicMartini.Get("/logins", webService.WebGetLogins)
 	classicMartini.Post("/register", webService.RegisterUserPost)
 	classicMartini.Post("/getticket", webService.GetTicketPost)
