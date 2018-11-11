@@ -46,6 +46,8 @@ func (conf *Conf) WebGetUsers(params martini.Params) (int, string) {
 			userHtml += "<div class='record'> LastName: " + blockchainRecord.Record.LastName + "</div>"
 			userHtml += "<div class='record'> BirthDate: " + blockchainRecord.Record.BirthDate + "</div>"
 			userHtml += "<div class='record'> Photo: " + blockchainRecord.Record.Photo + "</div>"
+			userHtml += "<button class='accordion'>Public Key</button>"
+			userHtml += "<div class='panel'><p>" + blockchainRecord.Record.PublicKey + "</p></div>"
 			userHtml += "</div>"
 		}
 		// fmt.Println(encodedEntries)
