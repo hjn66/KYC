@@ -1,3 +1,11 @@
+main div, main div {
+     font-size: 14px;
+     font-weight: normal;
+     text-align: left;
+     width: 100%;
+     font-family: monospace;
+}
+
 main.container {
      margin-bottom: 100px;
 }
@@ -5,14 +13,6 @@ main.container {
 div.user {
      border: 2px solid green;
      margin: 10px;
-}
-
-div.user, div.record {
-     font-size: 14px;
-     font-weight: normal;
-     text-align: left;
-     width: 100%;
-     font-family: monospace;
 }
 
 div.record {
@@ -61,7 +61,7 @@ img.green {
      border: 10px solid green;
 }
 
-main div {
+main div.QRlogin {
      margin: auto;
      width: 50%;
      text-align: center;
@@ -92,16 +92,11 @@ main div {
 
 /* Style the accordion panel. Note: hidden by default */
 
-.panel {
+div.panel {
      padding: 10px;
      background-color: white;
      display: none;
      overflow: hidden;
      margin: 0;
-     font-size: 14px;
-     font-weight: normal;
-     text-align: left;
-     width: 100%;
      word-wrap: break-word;
-     font-family: monospace;
 }
