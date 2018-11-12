@@ -100,3 +100,11 @@ div.panel {
      margin: 0;
      word-wrap: break-word;
 }
+
+.login {
+     display: flex;
+}
+
+.record {
+     width: 80%;
+}

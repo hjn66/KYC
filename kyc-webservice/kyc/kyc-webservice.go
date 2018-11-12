@@ -82,9 +82,9 @@ func (conf *Conf) WebGetLogins(params martini.Params, req *http.Request) (int, s
 			}
 			loginsHtml += "</div>"
 			if login.CheckImage {
-				loginsHtml += "<div><img class='green' src='data:image/png;base64," + login.Image + "'/></div>"
+				loginsHtml += "<div class='LoginImage'><img class='green' src='data:image/png;base64," + login.Image + "'/></div>"
 			} else {
-				loginsHtml += "<div><img class='red' src='data:image/png;base64," + login.Image + "'/></div>"
+				loginsHtml += "<div class='LoginImage'><img class='red' src='data:image/png;base64," + login.Image + "'/></div>"
 			}
 		}
 		template, _ := ioutil.ReadFile("public/logins.html")
@@ -243,7 +243,7 @@ func (conf *Conf) RegisterUserPost(params martini.Params,
 	var user, invokeUser User
 	err = json.Unmarshal(requestBody, &user)
 	fmt.Println("------------------Register-------------------")
-	fmt.Println("firstName:" + user.FirstName + " lastName:" + user.LastName + " Image:" + user.Photo + " NationalID:" + user.NationalID)
+	fmt.Println("firstName:" + user.FirstName + " lastName:" + user.LastName + " NationalID:" + user.NationalID)
 
 	h := sha256.New()
 	h.Write([]byte(user.NationalID))
