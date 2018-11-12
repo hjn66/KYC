@@ -81,10 +81,11 @@ func (conf *Conf) WebGetLogins(params martini.Params, req *http.Request) (int, s
 				loginsHtml += "<div class='data red'> Last Name: " + login.LastName + "</div>"
 			}
 			loginsHtml += "</div>"
+			loginsHtml += "<div class='LoginImage'><img src='data:image/png;base64," + login.Image + "'/>"
 			if login.CheckImage {
-				loginsHtml += "<div class='LoginImage'><img class='green' src='data:image/png;base64," + login.Image + "'/></div>"
+				loginsHtml += "<img class='badge' src='images/true.png'/></div>"
 			} else {
-				loginsHtml += "<div class='LoginImage'><img class='red' src='data:image/png;base64," + login.Image + "'/></div>"
+				loginsHtml += "<img class='badge' src='images/false.png'/></div>"
 			}
 		}
 		template, _ := ioutil.ReadFile("public/logins.html")
