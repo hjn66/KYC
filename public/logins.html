@@ -1,14 +1,12 @@
 <html>
   <head>
-    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="js/scripts.js"></script>
     <link href="css/bootstrap.min.css" rel="stylesheet" />
     <link href="css/bootstrap-theme.min.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
-    <title>KYC Service - Login (QR Ticket)</title>
+    <title>KYC Service - Home</title>
   </head>
 
-  <body onload="checkLogin('{NOUNCE}')">
+  <body>
     <nav class="navbar navbar-default">
       <div class="container">
         <div class="navbar-header">
@@ -29,31 +27,8 @@
       </div>
     </nav>
     <main class="container">
-      <img id="qr" src="data:image/png;base64,{QRIMAGE}" />
-
-      <div class="hidden" id="FirstName">Check First Name</div>
-      <div class="hidden" id="LastName">Check Last Name</div>
-      <div><img class="hidden" id="Image" /></div>
-      <button class="accordion">Ticket</button>
-      <div class="panel"><p>{TICKET}</p></div>
-      <button class="accordion">Nounce</button>
-      <div class="panel"><p>{NOUNCE}</p></div>
+      <h1>Logins List</h1>
+      {LOGINS}
     </main>
-    <script>
-      var acc = document.getElementsByClassName("accordion");
-      var i;
-
-      for (i = 0; i < acc.length; i++) {
-        acc[i].addEventListener("click", function() {
-          this.classList.toggle("active");
-          var panel = this.nextElementSibling;
-          if (panel.style.display === "block") {
-            panel.style.display = "none";
-          } else {
-            panel.style.display = "block";
-          }
-        });
-      }
-    </script>
   </body>
 </html>

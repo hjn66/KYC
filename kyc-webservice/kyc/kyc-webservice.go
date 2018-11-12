@@ -62,14 +62,35 @@ func (conf *Conf) WebGetUsers(params martini.Params) (int, string) {
 func (conf *Conf) WebGetLogins(params martini.Params, req *http.Request) (int, string) {
 	if len(req.URL.Query()) == 0 {
 		// No Query. Return entire collection encoded as JSON.
-		encodedEntries, err := json.Marshal(conf.loginTable.GetAllEntries())
-		if err != nil {
-			// Failed encoding collection.
-			return http.StatusInternalServerError, "internal error"
+		logins := conf.loginTable.GetAllEntries()
+		loginsHtml := ""
+		for _, login := range logins {
+			loginDate := login.LoginDate.Format("2006-01-02 15:04:05")
+			loginsHtml += "<div class='login'>"
+			loginsHtml += "<div class='record'>"
+			loginsHtml += "<div class='data'> GUID: " + strconv.Itoa(login.GUID) + "</div>"
+			loginsHtml += "<div class='data'> Login Date: " + loginDate + "</div>"
+			if login.CheckFirstName {
+				loginsHtml += "<div class='data green'> First Name: " + login.FirstName + "</div>"
+			} else {
+				loginsHtml += "<div class='data red'> First Name: " + login.FirstName + "</div>"
+			}
+			if login.CheckLastName {
+				loginsHtml += "<div class='data green'> Last Name: " + login.LastName + "</div>"
+			} else {
+				loginsHtml += "<div class='data red'> Last Name: " + login.LastName + "</div>"
+			}
+			loginsHtml += "</div>"
+			if login.CheckImage {
+				loginsHtml += "<img class='green' src='data:image/png;base64," + login.Image + "'/>"
+			} else {
+				loginsHtml += "<img class='red' src='data:image/png;base64," + login.Image + "'/>"
+			}
 		}
-
-		// Return encoded entries.
-		return http.StatusOK, string(encodedEntries)
+		template, _ := ioutil.ReadFile("public/logins.html")
+		html := string(template)
+		html = strings.Replace(html, "{LOGINS}", loginsHtml, 1)
+		return http.StatusOK, html
 	} else {
 		nounce := req.URL.Query().Get("nounce")
 		if nounce != "" {
