@@ -1,11 +1,11 @@
 package kyc
 
 import (
+	"KYC/web/controllers"
 	"crypto/rsa"
 	"fmt"
 	"sync"
-
-	"KYC/web/controllers"
+	"time"
 )
 
 type User struct {
@@ -41,7 +41,7 @@ type QRTicket struct {
 
 type Login struct {
 	Nounce         string
-	Expiration     string
+	LoginDate      time.Time
 	GUID           int
 	FirstName      string
 	LastName       string

@@ -50,15 +50,6 @@ func (conf *Conf) WebGetUsers(params martini.Params) (int, string) {
 			userHtml += "<div class='panel'><p>" + blockchainRecord.Record.PublicKey + "</p></div>"
 			userHtml += "</div>"
 		}
-		// fmt.Println(encodedEntries)
-
-		// dataJson := `["1","2","3"]`
-		// var arr []string
-		// _ = json.Unmarshal([]byte(dataJson), &arr)
-		// log.Printf("Unmarshaled: %v", arr)
-		// fmt.Println(arr)
-
-		// Return encoded entries.
 		template, err := ioutil.ReadFile("public/users.html")
 		html := string(template)
 		html = strings.Replace(html, "{USERS}", userHtml, 1)
@@ -103,6 +94,7 @@ func (conf *Conf) WebGetLogins(params martini.Params, req *http.Request) (int, s
 func (conf *Conf) HomeGet(params martini.Params) (int, string) {
 	template, _ := ioutil.ReadFile("public/home.html")
 	html := string(template)
+
 	return http.StatusOK, html
 }
 
@@ -157,7 +149,7 @@ func (conf *Conf) GetTicketPost(params martini.Params,
 	defer req.Body.Close()
 	// Read request body.
 	requestBody, err := ioutil.ReadAll(req.Body)
-	fmt.Println("requestBody: " + string(requestBody))
+	// fmt.Println("requestBody: " + string(requestBody))
 	if err != nil {
 		return http.StatusInternalServerError, "internal error"
 	}
@@ -280,7 +272,7 @@ func (conf *Conf) LoginPost(params martini.Params,
 
 	// Read request body.
 	requestBody, err := ioutil.ReadAll(req.Body)
-	fmt.Println("requestBody: " + string(requestBody))
+	// fmt.Println("requestBody: " + string(requestBody))
 
 	if err != nil {
 		return http.StatusInternalServerError, "Internal error"
@@ -400,7 +392,7 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 
 	// Read request body.
 	requestBody, err := ioutil.ReadAll(req.Body)
-	fmt.Println("requestBody: " + string(requestBody))
+	// fmt.Println("requestBody: " + string(requestBody))
 
 	if err != nil {
 		return http.StatusInternalServerError, "Internal error"
@@ -441,7 +433,7 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	err = json.Unmarshal(requestBody, &checkFieldData)
 	fmt.Println("----------------checkFieldData---------------")
 	fmt.Println("firstName:" + checkFieldData.FirstName + " lastName:" + checkFieldData.LastName + " Image:" + checkFieldData.Image)
-	fmt.Println(checkFieldData)
+	// fmt.Println(checkFieldData)
 	if err != nil {
 		loginResponse.Message = "Bad Request Format, Need Ticket token by getticketQR, FirstName, LastName, Image, GUID and signed Nounce"
 		encodedLoginResponse, _ := json.Marshal(loginResponse)
@@ -547,6 +539,8 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	login.FirstName = checkFieldData.FirstName
 	login.LastName = checkFieldData.LastName
 	login.Image = checkFieldData.Image
+	login.LoginDate = time.Now()
+	//fmt.Println(req.RemoteAddr)
 	conf.loginTable.addLogin(login)
 	encodedLoginResponse, _ := json.Marshal(loginResponse)
 	return http.StatusOK, string(encodedLoginResponse)
