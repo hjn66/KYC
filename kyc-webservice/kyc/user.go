@@ -55,24 +55,32 @@ type loginTable struct {
 	loginList []*Login
 	mutex     *sync.Mutex
 }
-
-type Conf struct {
-	loginTable *loginTable
-	app        *controllers.Application
-	privateKey *rsa.PrivateKey
+type Register struct {
+	Nounce       string
+	RegisterDate time.Time
+	Status       string
+	User         User
 }
 
-func NewLoginTable() *loginTable {
-	return &loginTable{
-		make([]*Login, 0),
-		new(sync.Mutex),
-	}
+type RegisterTable struct {
+	RegisterList []*Register
+	mutex        *sync.Mutex
+}
+
+type Conf struct {
+	loginTable    *loginTable
+	RegisterTable *RegisterTable
+	app           *controllers.Application
+	privateKey    *rsa.PrivateKey
 }
 
 func New(application *controllers.Application) *Conf {
 	return &Conf{
 		&loginTable{
 			make([]*Login, 0),
+			new(sync.Mutex),
+		}, &RegisterTable{
+			make([]*Register, 0),
 			new(sync.Mutex),
 		},
 		application,
@@ -118,4 +126,56 @@ func (logins *loginTable) GetLogin(nounce string) (*Login, error) {
 	}
 
 	return nil, fmt.Errorf("Not Found")
+}
+
+// addLogin adds a new Login with the provided data.
+func (registers *RegisterTable) addRegister(newRegister Register) {
+	// Acquire our lock and make sure it will be released.
+	registers.mutex.Lock()
+	defer registers.mutex.Unlock()
+	newRegister.Status = "Pending"
+	// Add entry to the RegisterTable
+	registers.RegisterList = append(registers.RegisterList, &newRegister)
+	return
+}
+
+// GetAllEntries returns all non-nil entries in the RegisterTable.
+func (registers *RegisterTable) GetAllEntries() []*Register {
+	// Placeholder for the entries we will be returning.
+	entries := make([]*Register, 0)
+
+	// Iterate through all existig entries.
+	for _, entry := range registers.RegisterList {
+		if entry != nil {
+			// Entry is not nil, so we want to return it.
+			entries = append(entries, entry)
+		}
+	}
+
+	return entries
+}
+
+// GetLogin returns entry in the RegisterTable.
+func (registers *RegisterTable) GetRegister(nounce string) (*Register, error) {
+
+	for _, register := range registers.RegisterList {
+		if register.Nounce == nounce {
+			return register, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Not Found")
+}
+
+// GetLogin returns entry in the RegisterTable.
+func (registers *RegisterTable) changeRegisterStatus(nounce string, status string) error {
+
+	for _, register := range registers.RegisterList {
+		if register.Nounce == nounce {
+			register.Status = status
+			return nil
+		}
+	}
+
+	return fmt.Errorf("Not Found")
 }

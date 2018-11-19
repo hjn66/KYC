@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="js/scripts.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+    <title>KYC Service - Login (QR Ticket)</title>
+  </head>
+
+  <body onload="checkRegister('{NOUNCE}')">
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mainMenu" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/"> <img src="images/KYCLogo.png" alt="chainHero" title="chainHero" /> KYC Service </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="mainMenu">
+          <ul class="nav navbar-nav">
+            <li><a href="/getticketQR">Login (QR Ticket)</a></li>
+            <li><a href="/registerQR">Register (QR Ticket)</a></li>
+            <li><a href="/users">Users List</a></li>
+            <li><a href="/logins">Logins List</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <main class="container">
+      <img id="qr" src="data:image/png;base64,{QRIMAGE}" />
+
+      <div class="QRlogin hidden" id="FirstName">Check First Name</div>
+      <div class="QRlogin hidden" id="LastName">Check Last Name</div>
+      <div class="QRlogin"><img class="hidden" id="Image" /></div>
+      <button class="accordion">Ticket</button>
+      <div class="panel"><p>{TICKET}</p></div>
+      <button class="accordion">Nounce</button>
+      <div class="panel"><p>{NOUNCE}</p></div>
+    </main>
+    <script>
+      var acc = document.getElementsByClassName("accordion");
+      var i;
+
+      for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+          this.classList.toggle("active");
+          var panel = this.nextElementSibling;
+          if (panel.style.display === "block") {
+            panel.style.display = "none";
+          } else {
+            panel.style.display = "block";
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

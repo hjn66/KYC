@@ -35,3 +35,26 @@ function checkLogin(nonce) {
     }
   });
 }
+
+function checkRegister(nonce) {
+  $.get("/registers?nounce=" + nonce, function(data) {
+    var register = JSON.parse(data);
+    if (register.Nounce) {
+      // alert("Data Loaded: " + data);
+      $("#ticket").addClass("hidden");
+      $("#qr").addClass("hidden");
+      $("#nounce").addClass("hidden");
+
+      $("#FirstName").removeClass("hidden");
+      $("#FirstName").text("First Name : " + register.User.FirstName);
+
+      $("#LastName").removeClass("hidden");
+      $("#LastName").text("Last Name : " + register.User.LastName);
+
+      $("#Image").removeClass("hidden");
+      $("#Image").attr("src", "data:image/png;base64," + register.User.Photo);
+    } else {
+      setTimeout(checkRegister, 1000, nonce);
+    }
+  });
+}

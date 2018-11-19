@@ -112,10 +112,106 @@ func (conf *Conf) WebGetLogins(params martini.Params, req *http.Request) (int, s
 	return http.StatusOK, "{}"
 }
 
+// WebGetRegisters implements webservice.WebGetRegisters.
+func (conf *Conf) WebGetRegisters(params martini.Params, req *http.Request) (int, string) {
+	if len(req.URL.Query()) == 0 {
+		// No Query. Return entire collection encoded as JSON.
+		logins := conf.loginTable.GetAllEntries()
+		loginsHtml := ""
+		for _, login := range logins {
+			loginDate := login.LoginDate.Format("2006-01-02 15:04:05")
+			loginsHtml += "<div class='login'>"
+			loginsHtml += "<div class='record'>"
+			loginsHtml += "<div class='data'> GUID: " + strconv.Itoa(login.GUID) + "</div>"
+			loginsHtml += "<div class='data'> Login Date: " + loginDate + "</div>"
+			if login.CheckFirstName {
+				loginsHtml += "<div class='data green'> First Name: " + login.FirstName + "</div>"
+			} else {
+				loginsHtml += "<div class='data red'> First Name: " + login.FirstName + "</div>"
+			}
+			if login.CheckLastName {
+				loginsHtml += "<div class='data green'> Last Name: " + login.LastName + "</div>"
+			} else {
+				loginsHtml += "<div class='data red'> Last Name: " + login.LastName + "</div>"
+			}
+			loginsHtml += "</div>"
+			loginsHtml += "<div class='LoginImage'><img src='data:image/png;base64," + login.Image + "'/>"
+			if login.CheckImage {
+				loginsHtml += "<img class='badge' src='images/true.png'/></div>"
+			} else {
+				loginsHtml += "<img class='badge' src='images/false.png'/></div>"
+			}
+		}
+		template, _ := ioutil.ReadFile("public/logins.html")
+		html := string(template)
+		html = strings.Replace(html, "{LOGINS}", loginsHtml, 1)
+		return http.StatusOK, html
+	} else {
+		nounce := req.URL.Query().Get("nounce")
+		if nounce != "" {
+			resRegister, err := conf.RegisterTable.GetRegister(nounce)
+			if err != nil {
+				// Nonce not Found
+				return http.StatusOK, "{}"
+			}
+			encodedRegister, err := json.Marshal(resRegister)
+
+			if err != nil {
+				// Failed encoding resLogin
+				return http.StatusInternalServerError, "internal error"
+			}
+			return http.StatusOK, string(encodedRegister)
+		}
+	}
+	return http.StatusOK, "{}"
+}
+
 // HomeGet implements webservice.HomeGet.
 func (conf *Conf) HomeGet(params martini.Params) (int, string) {
 	template, _ := ioutil.ReadFile("public/home.html")
 	html := string(template)
+
+	return http.StatusOK, html
+}
+
+// GetTicketQR implements webservice.GetTicketQR.
+func (conf *Conf) GetRegisterTicketQR(params martini.Params) (int, string) {
+	letterRunes := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+	nonce := make([]rune, 10)
+	for i := range nonce {
+		nonce[i] = letterRunes[random.Intn(len(letterRunes))]
+	}
+
+	expiration := time.Now().Add(10 * time.Minute)
+	var qrticket QRTicket
+	qrticket.Expiration = expiration.Format(time.RFC3339)
+	qrticket.Nounce = string(nonce)
+
+	encodedTicket, _ := json.Marshal(qrticket)
+	publicKey := conf.privateKey.PublicKey
+	sha256 := sha256.New()
+	encrypted, err := rsa.EncryptOAEP(sha256, rand.Reader, &publicKey, encodedTicket, nil)
+	if err != nil {
+		fmt.Printf("EncryptOAEP: %s\n", err)
+	}
+	data := struct {
+		T string
+		N string
+		O string
+	}{
+		T: base64.StdEncoding.EncodeToString(encrypted),
+		N: string(nonce),
+		O: "Melli Bank",
+	}
+	encodedData, err := json.Marshal(data)
+
+	var png []byte
+	png, err = qrcode.Encode(string(encodedData), qrcode.High, 512)
+	template, err := ioutil.ReadFile("public/register.html")
+	html := string(template)
+	html = strings.Replace(html, "{QRIMAGE}", base64.StdEncoding.EncodeToString(png), 1)
+	html = strings.Replace(html, "{TICKET}", data.T, 1)
+	html = strings.Replace(html, "{NOUNCE}", data.N, -1)
 
 	return http.StatusOK, html
 }
@@ -566,4 +662,92 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	conf.loginTable.addLogin(login)
 	encodedLoginResponse, _ := json.Marshal(loginResponse)
 	return http.StatusOK, string(encodedLoginResponse)
+}
+
+func (conf *Conf) PostRegisterTicketQR(params martini.Params,
+	req *http.Request) (int, string) {
+	// Make sure Body is closed when we are done.
+	defer req.Body.Close()
+
+	// Read request body.
+	requestBody, err := ioutil.ReadAll(req.Body)
+	// fmt.Println("requestBody: " + string(requestBody))
+
+	if err != nil {
+		return http.StatusInternalServerError, "Internal error"
+	}
+
+	if len(params) != 0 {
+		// No keys in params. This is not supported.
+		return http.StatusMethodNotAllowed, "Method not allowed"
+	}
+	registerData := struct {
+		Ticket     string
+		NationalId string
+		FirstName  string
+		LastName   string
+		Photo      string
+		BirthDate  string
+		PublicKey  string
+		Nounce     string
+	}{
+		Ticket:     "",
+		NationalId: "",
+		FirstName:  "",
+		LastName:   "",
+		Photo:      "",
+		BirthDate:  "",
+		PublicKey:  "",
+		Nounce:     "",
+	}
+	err = json.Unmarshal(requestBody, &registerData)
+	fmt.Println("----------------PostRegisterTicketQR---------------")
+	fmt.Println("firstName:" + registerData.FirstName + " lastName:" + registerData.LastName + " BirtDate:" + registerData.BirthDate + " Nounce:" + registerData.Nounce)
+	// fmt.Println(checkFieldData)
+	if err != nil {
+		message := "Bad Request Format, Need Ticket token by registerQR, NationalId, FirstName, LastName, Image and Nounce"
+		return http.StatusOK, message
+	}
+
+	var qrticket QRTicket
+	sha256 := sha256.New()
+	decodedTikcet, err := base64.StdEncoding.DecodeString(registerData.Ticket)
+	if err != nil {
+		message := "Invalid Ticket - Base64 decode Error"
+		return http.StatusOK, message
+	}
+	decryptedTicket, err := rsa.DecryptOAEP(sha256, rand.Reader, conf.privateKey, decodedTikcet, nil)
+	if err != nil {
+		message := "Invalid Ticket - Can not decrypte"
+		return http.StatusOK, message
+	}
+	err = json.Unmarshal(decryptedTicket, &qrticket)
+	if err != nil {
+		message := "Invalid Ticket - Bad format ticket"
+		return http.StatusOK, message
+	}
+	ticketTime, err := time.Parse(time.RFC3339, qrticket.Expiration)
+	if err != nil {
+		message := "Invalid Ticket - Time Parse Problem"
+		return http.StatusOK, message
+	}
+	if time.Now().After(ticketTime) {
+		message := "Expired Ticket"
+		return http.StatusOK, message
+	}
+	var user User
+	user.FirstName = registerData.FirstName
+	user.LastName = registerData.LastName
+	user.NationalID = registerData.NationalId
+	user.BirthDate = registerData.BirthDate
+	user.Photo = registerData.Photo
+	user.PublicKey = registerData.PublicKey
+	var register Register
+	register.User = user
+	register.RegisterDate = time.Now()
+	register.Nounce = registerData.Nounce
+	register.Status = "Pending"
+	//fmt.Println(req.RemoteAddr)
+	conf.RegisterTable.addRegister(register)
+	return http.StatusOK, "Register"
 }
