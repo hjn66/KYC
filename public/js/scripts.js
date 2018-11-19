@@ -44,12 +44,13 @@ function checkRegister(nonce) {
       $("#ticket").addClass("hidden");
       $("#qr").addClass("hidden");
       $("#nounce").addClass("hidden");
+      $("#registerForm").removeClass("hidden");
 
       $("#FirstName").removeClass("hidden");
-      $("#FirstName").text("First Name : " + register.User.FirstName);
+      $("#FirstName").val(register.User.FirstName);
 
       $("#LastName").removeClass("hidden");
-      $("#LastName").text("Last Name : " + register.User.LastName);
+      $("#LastName").val(register.User.LastName);
 
       $("#Image").removeClass("hidden");
       $("#Image").attr("src", "data:image/png;base64," + register.User.Photo);

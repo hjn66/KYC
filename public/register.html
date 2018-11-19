@@ -31,7 +31,11 @@
     </nav>
     <main class="container">
       <img id="qr" src="data:image/png;base64,{QRIMAGE}" />
-
+      <form class="QRlogin hidden" id="registerForm" action="/register">
+        First name: <input type="text" id="FirstName" name="firstname" value="" /> Last name:
+        <input type="text" id="LastName" name="lastname" value="" /> <br /><br />
+        <input type="submit" value="Approve" />
+      </form>
       <div class="QRlogin hidden" id="FirstName">Check First Name</div>
       <div class="QRlogin hidden" id="LastName">Check Last Name</div>
       <div class="QRlogin"><img class="hidden" id="Image" /></div>
