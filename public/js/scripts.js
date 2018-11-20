@@ -1,11 +1,11 @@
 function checkLogin(nonce) {
-  $.get("/logins?nounce=" + nonce, function(data) {
+  $.get("/logins?nonce=" + nonce, function(data) {
     var login = JSON.parse(data);
-    if (login.Nounce) {
+    if (login.nonce) {
       // alert("Data Loaded: " + data);
       $("#ticket").addClass("hidden");
       $("#qr").addClass("hidden");
-      $("#nounce").addClass("hidden");
+      $("#nonce").addClass("hidden");
 
       $("#FirstName").removeClass("hidden");
       if (login.CheckFirstName) {
@@ -37,13 +37,13 @@ function checkLogin(nonce) {
 }
 
 function checkRegister(nonce) {
-  $.get("/registers?nounce=" + nonce, function(data) {
+  $.get("/registers?nonce=" + nonce, function(data) {
     var register = JSON.parse(data);
-    if (register.Nounce) {
+    if (register.nonce) {
       // alert("Data Loaded: " + data);
       $("#ticket").addClass("hidden");
       $("#qr").addClass("hidden");
-      $("#nounce").addClass("hidden");
+      $("#nonce").addClass("hidden");
       $("#registerForm").removeClass("hidden");
 
       $("#FirstName").removeClass("hidden");
@@ -51,6 +51,7 @@ function checkRegister(nonce) {
 
       $("#LastName").removeClass("hidden");
       $("#LastName").val(register.User.LastName);
+      $("#BirthDate").val(register.User.BirthDate);
 
       $("#Image").removeClass("hidden");
       $("#Image").attr("src", "data:image/png;base64," + register.User.Photo);

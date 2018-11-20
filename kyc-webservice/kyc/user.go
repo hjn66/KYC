@@ -19,7 +19,7 @@ type User struct {
 
 type Ticket struct {
 	Expiration string
-	Nounce     string
+	nonce     string
 	GUID       int
 }
 type BlockChainRecord struct {
@@ -36,11 +36,11 @@ type BlockChainDate struct {
 }
 type QRTicket struct {
 	Expiration string
-	Nounce     string
+	nonce     string
 }
 
 type Login struct {
-	Nounce         string
+	nonce         string
 	LoginDate      time.Time
 	GUID           int
 	FirstName      string
@@ -56,7 +56,7 @@ type loginTable struct {
 	mutex     *sync.Mutex
 }
 type Register struct {
-	Nounce       string
+	nonce       string
 	RegisterDate time.Time
 	Status       string
 	User         User
@@ -117,10 +117,10 @@ func (logins *loginTable) GetAllEntries() []*Login {
 }
 
 // GetLogin returns entry in the loginTable.
-func (logins *loginTable) GetLogin(nounce string) (*Login, error) {
+func (logins *loginTable) GetLogin(nonce string) (*Login, error) {
 
 	for _, login := range logins.loginList {
-		if login.Nounce == nounce {
+		if login.nonce == nonce {
 			return login, nil
 		}
 	}
@@ -156,10 +156,10 @@ func (registers *RegisterTable) GetAllEntries() []*Register {
 }
 
 // GetLogin returns entry in the RegisterTable.
-func (registers *RegisterTable) GetRegister(nounce string) (*Register, error) {
+func (registers *RegisterTable) GetRegister(nonce string) (*Register, error) {
 
 	for _, register := range registers.RegisterList {
-		if register.Nounce == nounce {
+		if register.nonce == nonce {
 			return register, nil
 		}
 	}
@@ -168,10 +168,10 @@ func (registers *RegisterTable) GetRegister(nounce string) (*Register, error) {
 }
 
 // GetLogin returns entry in the RegisterTable.
-func (registers *RegisterTable) changeRegisterStatus(nounce string, status string) error {
+func (registers *RegisterTable) changeRegisterStatus(nonce string, status string) error {
 
 	for _, register := range registers.RegisterList {
-		if register.Nounce == nounce {
+		if register.nonce == nonce {
 			register.Status = status
 			return nil
 		}

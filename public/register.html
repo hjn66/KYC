@@ -32,8 +32,9 @@
     <main class="container">
       <img id="qr" src="data:image/png;base64,{QRIMAGE}" />
       <form class="QRlogin hidden" id="registerForm" action="/register">
-        First name: <input type="text" id="FirstName" name="firstname" value="" /> Last name:
-        <input type="text" id="LastName" name="lastname" value="" /> <br /><br />
+        First name: <input type="text" id="FirstName" name="firstname" value="" /> <br />
+        Last name: <input type="text" id="LastName" name="lastname" value="" /><br />
+        Birth Date:<input type="text" id="BirthDate" name="birthDate" value="" /><br />
         <input type="submit" value="Approve" />
       </form>
       <div class="QRlogin hidden" id="FirstName">Check First Name</div>
@@ -41,7 +42,7 @@
       <div class="QRlogin"><img class="hidden" id="Image" /></div>
       <button class="accordion">Ticket</button>
       <div class="panel"><p>{TICKET}</p></div>
-      <button class="accordion">Nounce</button>
+      <button class="accordion">nonce</button>
       <div class="panel"><p>{NOUNCE}</p></div>
     </main>
     <script>

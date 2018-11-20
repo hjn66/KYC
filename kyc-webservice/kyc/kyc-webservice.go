@@ -93,9 +93,9 @@ func (conf *Conf) WebGetLogins(params martini.Params, req *http.Request) (int, s
 		html = strings.Replace(html, "{LOGINS}", loginsHtml, 1)
 		return http.StatusOK, html
 	} else {
-		nounce := req.URL.Query().Get("nounce")
-		if nounce != "" {
-			resLogin, err := conf.loginTable.GetLogin(nounce)
+		nonce := req.URL.Query().Get("nonce")
+		if nonce != "" {
+			resLogin, err := conf.loginTable.GetLogin(nonce)
 			if err != nil {
 				// Nonce not Found
 				return http.StatusOK, "{}"
@@ -147,9 +147,9 @@ func (conf *Conf) WebGetRegisters(params martini.Params, req *http.Request) (int
 		html = strings.Replace(html, "{LOGINS}", loginsHtml, 1)
 		return http.StatusOK, html
 	} else {
-		nounce := req.URL.Query().Get("nounce")
-		if nounce != "" {
-			resRegister, err := conf.RegisterTable.GetRegister(nounce)
+		nonce := req.URL.Query().Get("nonce")
+		if nonce != "" {
+			resRegister, err := conf.RegisterTable.GetRegister(nonce)
 			if err != nil {
 				// Nonce not Found
 				return http.StatusOK, "{}"
@@ -185,7 +185,7 @@ func (conf *Conf) GetRegisterTicketQR(params martini.Params) (int, string) {
 	expiration := time.Now().Add(10 * time.Minute)
 	var qrticket QRTicket
 	qrticket.Expiration = expiration.Format(time.RFC3339)
-	qrticket.Nounce = string(nonce)
+	qrticket.nonce = string(nonce)
 
 	encodedTicket, _ := json.Marshal(qrticket)
 	publicKey := conf.privateKey.PublicKey
@@ -227,7 +227,7 @@ func (conf *Conf) GetTicketQR(params martini.Params) (int, string) {
 	expiration := time.Now().Add(100 * time.Minute)
 	var qrticket QRTicket
 	qrticket.Expiration = expiration.Format(time.RFC3339)
-	qrticket.Nounce = string(nonce)
+	qrticket.nonce = string(nonce)
 
 	encodedTicket, _ := json.Marshal(qrticket)
 	publicKey := conf.privateKey.PublicKey
@@ -290,7 +290,7 @@ func (conf *Conf) GetTicketPost(params martini.Params,
 	}
 	var ticket Ticket
 	ticket.Expiration = expiration.Format(time.RFC3339)
-	ticket.Nounce = string(nonce)
+	ticket.nonce = string(nonce)
 	ticket.GUID = guid.GUID
 
 	encodedTicket, _ := json.Marshal(ticket)
@@ -302,10 +302,10 @@ func (conf *Conf) GetTicketPost(params martini.Params,
 	}
 	data := struct {
 		Ticket string
-		Nounce string
+		nonce  string
 	}{
 		Ticket: base64.StdEncoding.EncodeToString(encrypted),
-		Nounce: string(nonce),
+		nonce:  string(nonce),
 	}
 	encodedData, err := json.Marshal(data)
 	return http.StatusOK, string(encodedData)
@@ -410,17 +410,17 @@ func (conf *Conf) LoginPost(params martini.Params,
 	}
 
 	loginData := struct {
-		Ticket       string
-		NationalId   string
-		SignedNounce string
+		Ticket      string
+		NationalId  string
+		Signednonce string
 	}{
-		Ticket:       "",
-		NationalId:   "",
-		SignedNounce: "",
+		Ticket:      "",
+		NationalId:  "",
+		Signednonce: "",
 	}
 	err = json.Unmarshal(requestBody, &loginData)
 	if err != nil {
-		loginResponse.Message = "Bad Request Format, Need Ticket token by getticket, NationalID and encrypted Nounce"
+		loginResponse.Message = "Bad Request Format, Need Ticket token by getticket, NationalID and encrypted nonce"
 		encodedLoginResponse, _ := json.Marshal(loginResponse)
 		return http.StatusOK, string(encodedLoginResponse)
 	}
@@ -487,10 +487,10 @@ func (conf *Conf) LoginPost(params martini.Params,
 	publicKey := pub.(*rsa.PublicKey)
 
 	sha256.Reset()
-	sha256.Write([]byte(ticket.Nounce))
-	hashedNounce := sha256.Sum(nil)
-	signedNounce, _ := base64.StdEncoding.DecodeString(loginData.SignedNounce)
-	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashedNounce, signedNounce)
+	sha256.Write([]byte(ticket.nonce))
+	hashednonce := sha256.Sum(nil)
+	signednonce, _ := base64.StdEncoding.DecodeString(loginData.Signednonce)
+	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashednonce, signednonce)
 	if err != nil {
 		loginResponse.Message = "Login Failed - Signature verification Error!"
 		encodedLoginResponse, _ := json.Marshal(loginResponse)
@@ -534,26 +534,26 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	}
 
 	checkFieldData := struct {
-		Ticket       string
-		FirstName    string
-		LastName     string
-		Image        string
-		GUID         int
-		SignedNounce string
+		Ticket      string
+		FirstName   string
+		LastName    string
+		Image       string
+		GUID        int
+		Signednonce string
 	}{
-		Ticket:       "",
-		FirstName:    "",
-		LastName:     "",
-		Image:        "",
-		GUID:         -1,
-		SignedNounce: "",
+		Ticket:      "",
+		FirstName:   "",
+		LastName:    "",
+		Image:       "",
+		GUID:        -1,
+		Signednonce: "",
 	}
 	err = json.Unmarshal(requestBody, &checkFieldData)
 	fmt.Println("----------------checkFieldData---------------")
 	fmt.Println("firstName:" + checkFieldData.FirstName + " lastName:" + checkFieldData.LastName + " Image:" + checkFieldData.Image)
 	// fmt.Println(checkFieldData)
 	if err != nil {
-		loginResponse.Message = "Bad Request Format, Need Ticket token by getticketQR, FirstName, LastName, Image, GUID and signed Nounce"
+		loginResponse.Message = "Bad Request Format, Need Ticket token by getticketQR, FirstName, LastName, Image, GUID and signed nonce"
 		encodedLoginResponse, _ := json.Marshal(loginResponse)
 		return http.StatusOK, string(encodedLoginResponse)
 	}
@@ -609,10 +609,10 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	publicKey := pub.(*rsa.PublicKey)
 
 	sha256.Reset()
-	sha256.Write([]byte(qrticket.Nounce))
-	hashedNounce := sha256.Sum(nil)
-	signedNounce, _ := base64.StdEncoding.DecodeString(checkFieldData.SignedNounce)
-	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashedNounce, signedNounce)
+	sha256.Write([]byte(qrticket.nonce))
+	hashednonce := sha256.Sum(nil)
+	signednonce, _ := base64.StdEncoding.DecodeString(checkFieldData.Signednonce)
+	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashednonce, signednonce)
 	if err != nil {
 		loginResponse.Message = "Login Failed - Signature verification Error!"
 		encodedLoginResponse, _ := json.Marshal(loginResponse)
@@ -653,7 +653,7 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	login.CheckLastName = loginResponse.CheckLastName
 	login.CheckImage = loginResponse.CheckImage
 	login.GUID = checkFieldData.GUID
-	login.Nounce = qrticket.Nounce
+	login.nonce = qrticket.nonce
 	login.FirstName = checkFieldData.FirstName
 	login.LastName = checkFieldData.LastName
 	login.Image = checkFieldData.Image
@@ -689,7 +689,7 @@ func (conf *Conf) PostRegisterTicketQR(params martini.Params,
 		Photo      string
 		BirthDate  string
 		PublicKey  string
-		Nounce     string
+		Nonce      string
 	}{
 		Ticket:     "",
 		NationalId: "",
@@ -698,14 +698,14 @@ func (conf *Conf) PostRegisterTicketQR(params martini.Params,
 		Photo:      "",
 		BirthDate:  "",
 		PublicKey:  "",
-		Nounce:     "",
+		Nonce:      "",
 	}
 	err = json.Unmarshal(requestBody, &registerData)
 	fmt.Println("----------------PostRegisterTicketQR---------------")
-	fmt.Println("firstName:" + registerData.FirstName + " lastName:" + registerData.LastName + " BirtDate:" + registerData.BirthDate + " Nounce:" + registerData.Nounce)
+	fmt.Println("firstName:" + registerData.FirstName + " lastName:" + registerData.LastName + " BirtDate:" + registerData.BirthDate + " nonce:" + registerData.Nonce)
 	// fmt.Println(checkFieldData)
 	if err != nil {
-		message := "Bad Request Format, Need Ticket token by registerQR, NationalId, FirstName, LastName, Image and Nounce"
+		message := "Bad Request Format, Need Ticket token by registerQR, NationalId, FirstName, LastName, Image and nonce"
 		return http.StatusOK, message
 	}
 
@@ -745,7 +745,7 @@ func (conf *Conf) PostRegisterTicketQR(params martini.Params,
 	var register Register
 	register.User = user
 	register.RegisterDate = time.Now()
-	register.Nounce = registerData.Nounce
+	register.nonce = registerData.Nonce
 	register.Status = "Pending"
 	//fmt.Println(req.RemoteAddr)
 	conf.RegisterTable.addRegister(register)
