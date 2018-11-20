@@ -40,7 +40,7 @@ type QRTicket struct {
 }
 
 type Login struct {
-	nonce          string
+	Nonce          string
 	LoginDate      time.Time
 	GUID           int
 	FirstName      string
@@ -57,6 +57,7 @@ type loginTable struct {
 }
 type Register struct {
 	Nonce        string
+	GUID         int
 	RegisterDate time.Time
 	Status       string
 	User         User
@@ -120,7 +121,7 @@ func (logins *loginTable) GetAllEntries() []*Login {
 func (logins *loginTable) GetLogin(nonce string) (*Login, error) {
 
 	for _, login := range logins.loginList {
-		if login.nonce == nonce {
+		if login.Nonce == nonce {
 			return login, nil
 		}
 	}
@@ -134,6 +135,7 @@ func (registers *RegisterTable) addRegister(newRegister Register) {
 	registers.mutex.Lock()
 	defer registers.mutex.Unlock()
 	newRegister.Status = "Pending"
+	newRegister.GUID = -1
 	// Add entry to the RegisterTable
 	registers.RegisterList = append(registers.RegisterList, &newRegister)
 	return
@@ -167,12 +169,27 @@ func (registers *RegisterTable) GetRegister(nonce string) (*Register, error) {
 	return nil, fmt.Errorf("Not Found")
 }
 
-// GetLogin returns entry in the RegisterTable.
+// changeRegisterStatus change status of register
 func (registers *RegisterTable) changeRegisterStatus(nonce string, status string) error {
-
-	for _, register := range registers.RegisterList {
+	registers.mutex.Lock()
+	defer registers.mutex.Unlock()
+	for index, register := range registers.RegisterList {
 		if register.Nonce == nonce {
-			register.Status = status
+			registers.RegisterList[index].Status = status
+			return nil
+		}
+	}
+
+	return fmt.Errorf("Not Found")
+}
+
+// GetLogin returns entry in the RegisterTable.
+func (registers *RegisterTable) setRegisterGUID(nonce string, guid int) error {
+	registers.mutex.Lock()
+	defer registers.mutex.Unlock()
+	for index, register := range registers.RegisterList {
+		if register.Nonce == nonce {
+			registers.RegisterList[index].GUID = guid
 			return nil
 		}
 	}

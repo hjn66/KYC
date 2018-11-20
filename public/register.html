@@ -31,19 +31,30 @@
     </nav>
     <main class="container">
       <img id="qr" src="data:image/png;base64,{QRIMAGE}" />
-      <form class="QRlogin hidden" id="registerForm" action="/register">
-        First name: <input type="text" id="FirstName" name="firstname" value="" /> <br />
-        Last name: <input type="text" id="LastName" name="lastname" value="" /><br />
-        Birth Date:<input type="text" id="BirthDate" name="birthDate" value="" /><br />
-        <input type="submit" value="Approve" />
+      <form class="QRlogin hidden" id="registerForm" action="/register" method="POST">
+        <input type="hidden" id="NationalIDForm" name="nationalID" value="" /> <input type="hidden" id="FirstNameForm" name="firstname" value="" />
+        <input type="hidden" id="LastNameForm" name="lastname" value="" /> <input type="hidden" id="BirthDateForm" name="birthDate" value="" />
+        <input type="hidden" id="PublicKeyForm" name="publicKey" value="" /> <input type="hidden" id="PhotoForm" name="photo" value="" />
+        <input type="hidden" id="Action" name="action" value="" /> <input type="hidden" id="Nonce" name="nonce" value="" />
+
+        <div class="login">
+          <div class="record">
+            <div id="RegisterDate" class="data">Register Date:</div>
+            <div id="NationalID" class="data">National ID:</div>
+            <div id="FirstName" class="data">First Name:</div>
+            <div id="LastName" class="data">Last Name:</div>
+            <div id="BirthDate" class="data">Birth Date:</div>
+            <button class="accordion" type="button">Public Key</button>
+            <div class="panel"><p id="PublicKey"></p></div>
+          </div>
+          <div class="LoginImage"><img id="Image" /></div>
+        </div>
+        <button type="button" onclick="submitForm('approve')">Approve</button> <button type="button" onclick="submitForm('deny')">Deny</button>
       </form>
-      <div class="QRlogin hidden" id="FirstName">Check First Name</div>
-      <div class="QRlogin hidden" id="LastName">Check Last Name</div>
-      <div class="QRlogin"><img class="hidden" id="Image" /></div>
-      <button class="accordion">Ticket</button>
-      <div class="panel"><p>{TICKET}</p></div>
-      <button class="accordion">nonce</button>
-      <div class="panel"><p>{NOUNCE}</p></div>
+      <button id="TicketB" class="accordion">Ticket</button>
+      <div id="TicketD" class="panel"><p>{TICKET}</p></div>
+      <button id="NonceB" class="accordion">Nonce</button>
+      <div id="NonceD" class="panel"><p>{NOUNCE}</p></div>
     </main>
     <script>
       var acc = document.getElementsByClassName("accordion");

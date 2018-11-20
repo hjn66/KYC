@@ -42,22 +42,35 @@ function checkRegister(nonce) {
     console.log(register);
     if (register.Nonce) {
       // alert("Data Loaded: " + data);
-      $("#ticket").addClass("hidden");
+      $("#TicketB").addClass("hidden");
+      $("#TicketD").addClass("hidden");
+      $("#NonceB").addClass("hidden");
+      $("#NonceD").addClass("hidden");
       $("#qr").addClass("hidden");
-      $("#nonce").addClass("hidden");
       $("#registerForm").removeClass("hidden");
 
-      $("#FirstName").removeClass("hidden");
-      $("#FirstName").val(register.User.FirstName);
+      $("#NationalIDForm").val(register.User.NationalID);
+      $("#FirstNameForm").val(register.User.FirstName);
+      $("#LastNameForm").val(register.User.LastName);
+      $("#BirthDateForm").val(register.User.BirthDate);
+      $("#PublicKeyForm").val(register.User.PublicKey);
+      $("#PhotoForm").val(register.User.Photo);
+      $("#Nonce").val(register.Nonce);
 
-      $("#LastName").removeClass("hidden");
-      $("#LastName").val(register.User.LastName);
-      $("#BirthDate").val(register.User.BirthDate);
-
-      $("#Image").removeClass("hidden");
+      $("#RegisterDate").text("Register Date: " + register.RegisterDate);
+      $("#NationalID").text("National ID: " + register.User.NationalID);
+      $("#FirstName").text("First Name: " + register.User.FirstName);
+      $("#LastName").text("Last Name: " + register.User.LastName);
+      $("#BirthDate").text("Birth Date: " + register.User.BirthDate);
+      $("#PublicKey").text(register.User.PublicKey);
       $("#Image").attr("src", "data:image/png;base64," + register.User.Photo);
     } else {
       setTimeout(checkRegister, 1000, nonce);
     }
   });
+}
+
+function submitForm(action) {
+  $("#Action").val(action);
+  $("#registerForm").submit();
 }

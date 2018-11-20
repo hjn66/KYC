@@ -123,6 +123,11 @@ func (conf *Conf) WebGetRegisters(params martini.Params, req *http.Request) (int
 			registerDate := register.RegisterDate.Format("2006-01-02 15:04:05")
 			registersHtml += "<div class='login'>"
 			registersHtml += "<div class='record'>"
+			if register.GUID == -1 {
+				registersHtml += "<div class='data'> GUID: UNKNOWN</div>"
+			} else {
+				registersHtml += "<div class='data'> GUID: " + strconv.Itoa(register.GUID) + "</div>"
+			}
 			registersHtml += "<div class='data'> Nonce: " + register.Nonce + "</div>"
 			registersHtml += "<div class='data'> Status: " + register.Status + "</div>"
 			registersHtml += "<div class='data'> Register Date: " + registerDate + "</div>"
@@ -130,8 +135,10 @@ func (conf *Conf) WebGetRegisters(params martini.Params, req *http.Request) (int
 			registersHtml += "<div class='data'> First Name: " + register.User.FirstName + "</div>"
 			registersHtml += "<div class='data'> Last Name: " + register.User.LastName + "</div>"
 			registersHtml += "<div class='data'> Birth Date: " + register.User.BirthDate + "</div>"
+			registersHtml += "<button class='accordion'>Public Key</button>"
+			registersHtml += "<div class='panel'><p>" + register.User.PublicKey + "</p></div>"
 			registersHtml += "</div>"
-			registersHtml += "<div class='LoginImage'><img src='data:image/png;base64," + register.User.Photo + "'/>"
+			registersHtml += "<div class='LoginImage'><img src='data:image/png;base64," + register.User.Photo + "'/></div>"
 			registersHtml += "</div>"
 		}
 		template, _ := ioutil.ReadFile("public/registers.html")
@@ -141,7 +148,6 @@ func (conf *Conf) WebGetRegisters(params martini.Params, req *http.Request) (int
 	} else {
 		nonce := req.URL.Query().Get("nonce")
 		if nonce != "" {
-			fmt.Println("-------------------------------" + nonce)
 			resRegister, err := conf.RegisterTable.GetRegister(nonce)
 			if err != nil {
 				// Nonce not Found
@@ -312,8 +318,10 @@ func (conf *Conf) RegisterUserPost(params martini.Params,
 	defer req.Body.Close()
 
 	// Read request body.
-	requestBody, err := ioutil.ReadAll(req.Body)
-
+	err := req.ParseForm()
+	for key, value := range req.Form {
+		fmt.Printf("%s = %s\n", key, value)
+	}
 	if err != nil {
 		return http.StatusInternalServerError, "Internal error"
 	}
@@ -322,6 +330,10 @@ func (conf *Conf) RegisterUserPost(params martini.Params,
 		// No keys in params. This is not supported.
 		return http.StatusMethodNotAllowed, "Method not allowed"
 	}
+	if req.Form.Get("action") == "deny" {
+		conf.RegisterTable.changeRegisterStatus(req.Form.Get("nonce"), "Denied")
+		return http.StatusMovedPermanently, "<head> <meta http-equiv='refresh' content='0; URL=/registerQR' /></head>"
+	}
 
 	lastuser, err := conf.app.Fabric.Query("LastUser")
 	if err != nil {
@@ -329,11 +341,15 @@ func (conf *Conf) RegisterUserPost(params martini.Params,
 	}
 	userkey := string(lastuser)
 
-	// Unmarshal entry sent by the user.
 	var user, invokeUser User
-	err = json.Unmarshal(requestBody, &user)
+	user.NationalID = req.Form.Get("nationalID")
+	user.FirstName = req.Form.Get("firstname")
+	user.LastName = req.Form.Get("lastname")
+	user.BirthDate = req.Form.Get("birthDate")
+	user.Photo = req.Form.Get("photo")
+	user.PublicKey = req.Form.Get("publicKey")
 	fmt.Println("------------------Register-------------------")
-	fmt.Println("firstName:" + user.FirstName + " lastName:" + user.LastName + " NationalID:" + user.NationalID)
+	fmt.Println("firstName:" + user.FirstName + " lastName:" + user.LastName + " NationalID:" + user.NationalID + " BirthDate:" + user.BirthDate)
 
 	h := sha256.New()
 	h.Write([]byte(user.NationalID))
@@ -359,21 +375,24 @@ func (conf *Conf) RegisterUserPost(params martini.Params,
 
 	userAsBytes, _ := json.Marshal(invokeUser)
 
-	txid, err := conf.app.Fabric.RegisterUser(userkey, userAsBytes)
+	_, err = conf.app.Fabric.RegisterUser(userkey, userAsBytes)
 
 	if err != nil {
 		return http.StatusInternalServerError, "Unable to register user in the blockchain"
 	}
 	userID, _ := strconv.Atoi(userkey)
-	data := &struct {
-		GUID int
-		TXID string
-	}{
-		GUID: userID,
-		TXID: txid,
-	}
-	encodedData, err := json.Marshal(data)
-	return http.StatusOK, string(encodedData)
+	// data := &struct {
+	// 	GUID int
+	// 	TXID string
+	// }{
+	// 	GUID: userID,
+	// 	TXID: txid,
+	// }
+	// encodedData, err := json.Marshal(data)
+	conf.RegisterTable.setRegisterGUID(req.Form.Get("nonce"), userID)
+	conf.RegisterTable.changeRegisterStatus(req.Form.Get("nonce"), "Approved")
+	return http.StatusMovedPermanently, "<head> <meta http-equiv='refresh' content='0; URL=/users' /></head>"
+	// return http.StatusOK, string(encodedData)
 }
 
 func (conf *Conf) LoginPost(params martini.Params,
@@ -646,7 +665,7 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	login.CheckLastName = loginResponse.CheckLastName
 	login.CheckImage = loginResponse.CheckImage
 	login.GUID = checkFieldData.GUID
-	login.nonce = qrticket.nonce
+	login.Nonce = qrticket.nonce
 	login.FirstName = checkFieldData.FirstName
 	login.LastName = checkFieldData.LastName
 	login.Image = checkFieldData.Image
