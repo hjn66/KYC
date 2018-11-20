@@ -19,7 +19,7 @@ type User struct {
 
 type Ticket struct {
 	Expiration string
-	nonce     string
+	nonce      string
 	GUID       int
 }
 type BlockChainRecord struct {
@@ -36,11 +36,11 @@ type BlockChainDate struct {
 }
 type QRTicket struct {
 	Expiration string
-	nonce     string
+	nonce      string
 }
 
 type Login struct {
-	nonce         string
+	nonce          string
 	LoginDate      time.Time
 	GUID           int
 	FirstName      string
@@ -56,7 +56,7 @@ type loginTable struct {
 	mutex     *sync.Mutex
 }
 type Register struct {
-	nonce       string
+	Nonce        string
 	RegisterDate time.Time
 	Status       string
 	User         User
@@ -159,7 +159,7 @@ func (registers *RegisterTable) GetAllEntries() []*Register {
 func (registers *RegisterTable) GetRegister(nonce string) (*Register, error) {
 
 	for _, register := range registers.RegisterList {
-		if register.nonce == nonce {
+		if register.Nonce == nonce {
 			return register, nil
 		}
 	}
@@ -171,7 +171,7 @@ func (registers *RegisterTable) GetRegister(nonce string) (*Register, error) {
 func (registers *RegisterTable) changeRegisterStatus(nonce string, status string) error {
 
 	for _, register := range registers.RegisterList {
-		if register.nonce == nonce {
+		if register.Nonce == nonce {
 			register.Status = status
 			return nil
 		}

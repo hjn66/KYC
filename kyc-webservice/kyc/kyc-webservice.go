@@ -87,6 +87,7 @@ func (conf *Conf) WebGetLogins(params martini.Params, req *http.Request) (int, s
 			} else {
 				loginsHtml += "<img class='badge' src='images/false.png'/></div>"
 			}
+			loginsHtml += "</div>"
 		}
 		template, _ := ioutil.ReadFile("public/logins.html")
 		html := string(template)
@@ -116,39 +117,31 @@ func (conf *Conf) WebGetLogins(params martini.Params, req *http.Request) (int, s
 func (conf *Conf) WebGetRegisters(params martini.Params, req *http.Request) (int, string) {
 	if len(req.URL.Query()) == 0 {
 		// No Query. Return entire collection encoded as JSON.
-		logins := conf.loginTable.GetAllEntries()
-		loginsHtml := ""
-		for _, login := range logins {
-			loginDate := login.LoginDate.Format("2006-01-02 15:04:05")
-			loginsHtml += "<div class='login'>"
-			loginsHtml += "<div class='record'>"
-			loginsHtml += "<div class='data'> GUID: " + strconv.Itoa(login.GUID) + "</div>"
-			loginsHtml += "<div class='data'> Login Date: " + loginDate + "</div>"
-			if login.CheckFirstName {
-				loginsHtml += "<div class='data green'> First Name: " + login.FirstName + "</div>"
-			} else {
-				loginsHtml += "<div class='data red'> First Name: " + login.FirstName + "</div>"
-			}
-			if login.CheckLastName {
-				loginsHtml += "<div class='data green'> Last Name: " + login.LastName + "</div>"
-			} else {
-				loginsHtml += "<div class='data red'> Last Name: " + login.LastName + "</div>"
-			}
-			loginsHtml += "</div>"
-			loginsHtml += "<div class='LoginImage'><img src='data:image/png;base64," + login.Image + "'/>"
-			if login.CheckImage {
-				loginsHtml += "<img class='badge' src='images/true.png'/></div>"
-			} else {
-				loginsHtml += "<img class='badge' src='images/false.png'/></div>"
-			}
+		registers := conf.RegisterTable.GetAllEntries()
+		registersHtml := ""
+		for _, register := range registers {
+			registerDate := register.RegisterDate.Format("2006-01-02 15:04:05")
+			registersHtml += "<div class='login'>"
+			registersHtml += "<div class='record'>"
+			registersHtml += "<div class='data'> Nonce: " + register.Nonce + "</div>"
+			registersHtml += "<div class='data'> Status: " + register.Status + "</div>"
+			registersHtml += "<div class='data'> Register Date: " + registerDate + "</div>"
+			registersHtml += "<div class='data'> NationalID: " + register.User.NationalID + "</div>"
+			registersHtml += "<div class='data'> First Name: " + register.User.FirstName + "</div>"
+			registersHtml += "<div class='data'> Last Name: " + register.User.LastName + "</div>"
+			registersHtml += "<div class='data'> Birth Date: " + register.User.BirthDate + "</div>"
+			registersHtml += "</div>"
+			registersHtml += "<div class='LoginImage'><img src='data:image/png;base64," + register.User.Photo + "'/>"
+			registersHtml += "</div>"
 		}
-		template, _ := ioutil.ReadFile("public/logins.html")
+		template, _ := ioutil.ReadFile("public/registers.html")
 		html := string(template)
-		html = strings.Replace(html, "{LOGINS}", loginsHtml, 1)
+		html = strings.Replace(html, "{REGISTERS}", registersHtml, 1)
 		return http.StatusOK, html
 	} else {
 		nonce := req.URL.Query().Get("nonce")
 		if nonce != "" {
+			fmt.Println("-------------------------------" + nonce)
 			resRegister, err := conf.RegisterTable.GetRegister(nonce)
 			if err != nil {
 				// Nonce not Found
@@ -745,7 +738,7 @@ func (conf *Conf) PostRegisterTicketQR(params martini.Params,
 	var register Register
 	register.User = user
 	register.RegisterDate = time.Now()
-	register.nonce = registerData.Nonce
+	register.Nonce = registerData.Nonce
 	register.Status = "Pending"
 	//fmt.Println(req.RemoteAddr)
 	conf.RegisterTable.addRegister(register)

@@ -39,7 +39,8 @@ function checkLogin(nonce) {
 function checkRegister(nonce) {
   $.get("/registers?nonce=" + nonce, function(data) {
     var register = JSON.parse(data);
-    if (register.nonce) {
+    console.log(register);
+    if (register.Nonce) {
       // alert("Data Loaded: " + data);
       $("#ticket").addClass("hidden");
       $("#qr").addClass("hidden");
