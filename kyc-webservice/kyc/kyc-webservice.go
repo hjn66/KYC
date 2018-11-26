@@ -424,11 +424,11 @@ func (conf *Conf) LoginPost(params martini.Params,
 	loginData := struct {
 		Ticket      string
 		NationalId  string
-		Signednonce string
+		SignedNonce string
 	}{
 		Ticket:      "",
 		NationalId:  "",
-		Signednonce: "",
+		SignedNonce: "",
 	}
 	err = json.Unmarshal(requestBody, &loginData)
 	if err != nil {
@@ -501,7 +501,7 @@ func (conf *Conf) LoginPost(params martini.Params,
 	sha256.Reset()
 	sha256.Write([]byte(ticket.nonce))
 	hashednonce := sha256.Sum(nil)
-	signednonce, _ := base64.StdEncoding.DecodeString(loginData.Signednonce)
+	signednonce, _ := base64.StdEncoding.DecodeString(loginData.SignedNonce)
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashednonce, signednonce)
 	if err != nil {
 		loginResponse.Message = "Login Failed - Signature verification Error!"
