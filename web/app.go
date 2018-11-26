@@ -15,7 +15,6 @@ import (
 func Serve(app *controllers.Application) {
 
 	martiniClassic := martini.Classic()
-	// loginTable := kyc.NewLoginTable()
 	kyc := kyc.New(app)
 	webservice.RegisterWebService(kyc, martiniClassic)
 	fmt.Println("Listening (http://localhost:8003/) ...")

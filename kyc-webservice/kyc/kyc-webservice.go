@@ -36,8 +36,6 @@ func (conf *Conf) WebGetUsers(params martini.Params) (int, string) {
 		var blockchainData []BlockChainDate
 		err = json.Unmarshal(encodedEntries, &blockchainData)
 
-		// fmt.Println(users[0].GUID)
-		// fmt.Println(users[0].Record.FirstName)
 		userHtml := ""
 		for _, blockchainRecord := range blockchainData {
 			userHtml += "<div class='user'> GUID =" + blockchainRecord.GUID
@@ -266,7 +264,6 @@ func (conf *Conf) GetTicketPost(params martini.Params,
 	defer req.Body.Close()
 	// Read request body.
 	requestBody, err := ioutil.ReadAll(req.Body)
-	// fmt.Println("requestBody: " + string(requestBody))
 	if err != nil {
 		return http.StatusInternalServerError, "internal error"
 	}
@@ -319,9 +316,6 @@ func (conf *Conf) RegisterUserPost(params martini.Params,
 
 	// Read request body.
 	err := req.ParseForm()
-	for key, value := range req.Form {
-		fmt.Printf("%s = %s\n", key, value)
-	}
 	if err != nil {
 		return http.StatusInternalServerError, "Internal error"
 	}
@@ -402,7 +396,6 @@ func (conf *Conf) LoginPost(params martini.Params,
 
 	// Read request body.
 	requestBody, err := ioutil.ReadAll(req.Body)
-	// fmt.Println("requestBody: " + string(requestBody))
 
 	if err != nil {
 		return http.StatusInternalServerError, "Internal error"
@@ -469,7 +462,6 @@ func (conf *Conf) LoginPost(params martini.Params,
 		return http.StatusOK, string(encodedLoginResponse)
 	}
 	retrivedUserByte, err := conf.app.Fabric.Query(strconv.Itoa(ticket.GUID))
-	fmt.Println("----------GUID in Login--------------------:" + strconv.Itoa(ticket.GUID))
 	if err != nil {
 		loginResponse.Message = "BlockChain Error - Can not query blockchain"
 		encodedLoginResponse, _ := json.Marshal(loginResponse)
@@ -502,7 +494,6 @@ func (conf *Conf) LoginPost(params martini.Params,
 	sha256.Write([]byte(ticket.nonce))
 	hashednonce := sha256.Sum(nil)
 	signednonce, _ := base64.StdEncoding.DecodeString(loginData.SignedNonce)
-	fmt.Println(signednonce)
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashednonce, signednonce)
 	if err != nil {
 		loginResponse.Message = "Login Failed - Signature verification Error!"
@@ -523,7 +514,6 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 
 	// Read request body.
 	requestBody, err := ioutil.ReadAll(req.Body)
-	// fmt.Println("requestBody: " + string(requestBody))
 
 	if err != nil {
 		return http.StatusInternalServerError, "Internal error"
@@ -563,8 +553,7 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	}
 	err = json.Unmarshal(requestBody, &checkFieldData)
 	fmt.Println("----------------checkFieldData---------------")
-	fmt.Println("firstName:" + checkFieldData.FirstName + " lastName:" + checkFieldData.LastName + " Image:" + checkFieldData.Image)
-	// fmt.Println(checkFieldData)
+	fmt.Println("firstName:" + checkFieldData.FirstName + " lastName:" + checkFieldData.LastName)
 	if err != nil {
 		loginResponse.Message = "Bad Request Format, Need Ticket token by getticketQR, FirstName, LastName, Image, GUID and signed nonce"
 		encodedLoginResponse, _ := json.Marshal(loginResponse)
@@ -625,10 +614,6 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	sha256.Write([]byte(qrticket.Nonce))
 	hashednonce := sha256.Sum(nil)
 	signednonce, _ := base64.StdEncoding.DecodeString(checkFieldData.SignedNonce)
-	fmt.Println(checkFieldData.SignedNonce)
-	fmt.Println(signednonce)
-	fmt.Println(hashednonce)
-	fmt.Println(qrticket.Nonce)
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashednonce, signednonce)
 	if err != nil {
 		loginResponse.Message = "Login Failed - Signature verification Error!"
@@ -675,7 +660,6 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	login.LastName = checkFieldData.LastName
 	login.Image = checkFieldData.Image
 	login.LoginDate = time.Now()
-	//fmt.Println(req.RemoteAddr)
 	conf.loginTable.addLogin(login)
 	encodedLoginResponse, _ := json.Marshal(loginResponse)
 	return http.StatusOK, string(encodedLoginResponse)
@@ -688,7 +672,6 @@ func (conf *Conf) PostRegisterTicketQR(params martini.Params,
 
 	// Read request body.
 	requestBody, err := ioutil.ReadAll(req.Body)
-	// fmt.Println("requestBody: " + string(requestBody))
 
 	if err != nil {
 		return http.StatusInternalServerError, "Internal error"
@@ -720,7 +703,6 @@ func (conf *Conf) PostRegisterTicketQR(params martini.Params,
 	err = json.Unmarshal(requestBody, &registerData)
 	fmt.Println("----------------PostRegisterTicketQR---------------")
 	fmt.Println("firstName:" + registerData.FirstName + " lastName:" + registerData.LastName + " BirtDate:" + registerData.BirthDate + " nonce:" + registerData.Nonce)
-	// fmt.Println(checkFieldData)
 	if err != nil {
 		message := "Bad Request Format, Need Ticket token by registerQR, NationalId, FirstName, LastName, Image and nonce"
 		return http.StatusOK, message
@@ -764,7 +746,6 @@ func (conf *Conf) PostRegisterTicketQR(params martini.Params,
 	register.RegisterDate = time.Now()
 	register.Nonce = registerData.Nonce
 	register.Status = "Pending"
-	//fmt.Println(req.RemoteAddr)
 	conf.RegisterTable.addRegister(register)
 	return http.StatusOK, "Register"
 }
