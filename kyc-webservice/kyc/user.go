@@ -36,7 +36,7 @@ type BlockChainDate struct {
 }
 type QRTicket struct {
 	Expiration string
-	nonce      string
+	Nonce      string
 }
 
 type Login struct {

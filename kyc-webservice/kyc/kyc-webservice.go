@@ -184,7 +184,7 @@ func (conf *Conf) GetRegisterTicketQR(params martini.Params) (int, string) {
 	expiration := time.Now().Add(10 * time.Minute)
 	var qrticket QRTicket
 	qrticket.Expiration = expiration.Format(time.RFC3339)
-	qrticket.nonce = string(nonce)
+	qrticket.Nonce = string(nonce)
 
 	encodedTicket, _ := json.Marshal(qrticket)
 	publicKey := conf.privateKey.PublicKey
@@ -226,7 +226,7 @@ func (conf *Conf) GetTicketQR(params martini.Params) (int, string) {
 	expiration := time.Now().Add(100 * time.Minute)
 	var qrticket QRTicket
 	qrticket.Expiration = expiration.Format(time.RFC3339)
-	qrticket.nonce = string(nonce)
+	qrticket.Nonce = string(nonce)
 
 	encodedTicket, _ := json.Marshal(qrticket)
 	publicKey := conf.privateKey.PublicKey
@@ -622,11 +622,13 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	publicKey := pub.(*rsa.PublicKey)
 
 	sha256.Reset()
-	sha256.Write([]byte(qrticket.nonce))
+	sha256.Write([]byte(qrticket.Nonce))
 	hashednonce := sha256.Sum(nil)
 	signednonce, _ := base64.StdEncoding.DecodeString(checkFieldData.SignedNonce)
 	fmt.Println(checkFieldData.SignedNonce)
 	fmt.Println(signednonce)
+	fmt.Println(hashednonce)
+	fmt.Println(qrticket.Nonce)
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashednonce, signednonce)
 	if err != nil {
 		loginResponse.Message = "Login Failed - Signature verification Error!"
@@ -668,7 +670,7 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	login.CheckLastName = loginResponse.CheckLastName
 	login.CheckImage = loginResponse.CheckImage
 	login.GUID = checkFieldData.GUID
-	login.Nonce = qrticket.nonce
+	login.Nonce = qrticket.Nonce
 	login.FirstName = checkFieldData.FirstName
 	login.LastName = checkFieldData.LastName
 	login.Image = checkFieldData.Image
