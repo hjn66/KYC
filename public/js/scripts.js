@@ -1,7 +1,7 @@
 function checkLogin(nonce) {
   $.get("/logins?nonce=" + nonce, function(data) {
     var login = JSON.parse(data);
-    if (login.nonce) {
+    if (login.Nonce) {
       // alert("Data Loaded: " + data);
       $("#ticket").addClass("hidden");
       $("#qr").addClass("hidden");
