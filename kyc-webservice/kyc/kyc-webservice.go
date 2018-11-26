@@ -625,6 +625,8 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	sha256.Write([]byte(qrticket.nonce))
 	hashednonce := sha256.Sum(nil)
 	signednonce, _ := base64.StdEncoding.DecodeString(checkFieldData.SignedNonce)
+	fmt.Println(checkFieldData.SignedNonce)
+	fmt.Println(signednonce)
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashednonce, signednonce)
 	if err != nil {
 		loginResponse.Message = "Login Failed - Signature verification Error!"
