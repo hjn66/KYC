@@ -502,6 +502,7 @@ func (conf *Conf) LoginPost(params martini.Params,
 	sha256.Write([]byte(ticket.nonce))
 	hashednonce := sha256.Sum(nil)
 	signednonce, _ := base64.StdEncoding.DecodeString(loginData.SignedNonce)
+	fmt.Println(signednonce)
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashednonce, signednonce)
 	if err != nil {
 		loginResponse.Message = "Login Failed - Signature verification Error!"
@@ -551,14 +552,14 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 		LastName    string
 		Image       string
 		GUID        int
-		Signednonce string
+		SignedNonce string
 	}{
 		Ticket:      "",
 		FirstName:   "",
 		LastName:    "",
 		Image:       "",
 		GUID:        -1,
-		Signednonce: "",
+		SignedNonce: "",
 	}
 	err = json.Unmarshal(requestBody, &checkFieldData)
 	fmt.Println("----------------checkFieldData---------------")
@@ -623,7 +624,7 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	sha256.Reset()
 	sha256.Write([]byte(qrticket.nonce))
 	hashednonce := sha256.Sum(nil)
-	signednonce, _ := base64.StdEncoding.DecodeString(checkFieldData.Signednonce)
+	signednonce, _ := base64.StdEncoding.DecodeString(checkFieldData.SignedNonce)
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashednonce, signednonce)
 	if err != nil {
 		loginResponse.Message = "Login Failed - Signature verification Error!"
