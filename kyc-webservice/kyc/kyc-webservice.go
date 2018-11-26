@@ -350,7 +350,8 @@ func (conf *Conf) RegisterUserPost(params martini.Params,
 	user.PublicKey = req.Form.Get("publicKey")
 	fmt.Println("------------------Register-------------------")
 	fmt.Println("firstName:" + user.FirstName + " lastName:" + user.LastName + " NationalID:" + user.NationalID + " BirthDate:" + user.BirthDate)
-
+	fmt.Println(user.Photo)
+	fmt.Println(len(user.Photo))
 	h := sha256.New()
 	h.Write([]byte(user.NationalID))
 	invokeUser.NationalID = base64.StdEncoding.EncodeToString(h.Sum(nil))
@@ -564,7 +565,8 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	err = json.Unmarshal(requestBody, &checkFieldData)
 	fmt.Println("----------------checkFieldData---------------")
 	fmt.Println("firstName:" + checkFieldData.FirstName + " lastName:" + checkFieldData.LastName + " Image:" + checkFieldData.Image)
-	// fmt.Println(checkFieldData)
+	fmt.Println(checkFieldData.Image)
+	fmt.Println(len(checkFieldData.Image))
 	if err != nil {
 		loginResponse.Message = "Bad Request Format, Need Ticket token by getticketQR, FirstName, LastName, Image, GUID and signed nonce"
 		encodedLoginResponse, _ := json.Marshal(loginResponse)
@@ -657,6 +659,7 @@ func (conf *Conf) CheckFieldPost(params martini.Params,
 	}
 
 	sha256.Reset()
+	fmt.Println(len(checkFieldData.Image))
 	sha256.Write([]byte(checkFieldData.Image))
 	encodedImage := base64.StdEncoding.EncodeToString(sha256.Sum(nil))
 	if encodedImage == retrivedUser.Photo {
@@ -720,6 +723,7 @@ func (conf *Conf) PostRegisterTicketQR(params martini.Params,
 	err = json.Unmarshal(requestBody, &registerData)
 	fmt.Println("----------------PostRegisterTicketQR---------------")
 	fmt.Println("firstName:" + registerData.FirstName + " lastName:" + registerData.LastName + " BirtDate:" + registerData.BirthDate + " nonce:" + registerData.Nonce)
+	fmt.Println(registerData.Photo);
 	// fmt.Println(checkFieldData)
 	if err != nil {
 		message := "Bad Request Format, Need Ticket token by registerQR, NationalId, FirstName, LastName, Image and nonce"
