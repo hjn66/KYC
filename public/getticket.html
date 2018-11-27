@@ -32,9 +32,15 @@
     <main class="container">
       <img id="qr" src="data:image/png;base64,{QRIMAGE}" />
 
-      <div class="QRlogin hidden" id="FirstName">Check First Name</div>
-      <div class="QRlogin hidden" id="LastName">Check Last Name</div>
-      <div class="QRlogin"><img class="hidden" id="Image" /></div>
+      <div id="LoginForm" class="login">
+        <div class="record">
+          <div id="GUID" class="data">GUID:</div>
+          <div id="LoginDate" class="data">Login Date:</div>
+          <div id="FirstName" class="data">First Name:</div>
+          <div id="LastName" class="data">Last Name:</div>
+        </div>
+        <div class="LoginImage"><img id="Image" /><img class="badge" src="images/true.png" /></div>
+      </div>
       <button class="accordion">Ticket</button>
       <div class="panel"><p>{TICKET}</p></div>
       <button class="accordion">nonce</button>
