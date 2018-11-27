@@ -344,7 +344,6 @@ func (conf *Conf) RegisterUserPost(params martini.Params,
 	user.PublicKey = req.Form.Get("publicKey")
 	fmt.Println("------------------Register-------------------")
 	fmt.Println("firstName:" + user.FirstName + " lastName:" + user.LastName + " NationalID:" + user.NationalID + " BirthDate:" + user.BirthDate)
-
 	h := sha256.New()
 	h.Write([]byte(user.NationalID))
 	invokeUser.NationalID = base64.StdEncoding.EncodeToString(h.Sum(nil))
