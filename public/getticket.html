@@ -32,7 +32,7 @@
     <main class="container">
       <img id="qr" src="data:image/png;base64,{QRIMAGE}" />
 
-      <div id="LoginForm" class="login">
+      <div id="LoginForm" class="login hidden">
         <div class="record">
           <div id="GUID" class="data">GUID:</div>
           <div id="LoginDate" class="data">Login Date:</div>
@@ -41,10 +41,10 @@
         </div>
         <div class="LoginImage"><img id="Image" /><img class="badge" src="images/true.png" /></div>
       </div>
-      <button class="accordion">Ticket</button>
-      <div class="panel"><p>{TICKET}</p></div>
-      <button class="accordion">nonce</button>
-      <div class="panel"><p>{NOUNCE}</p></div>
+      <button id="TicketB" class="accordion">Ticket</button>
+      <div id="TicketD" class="panel"><p>{TICKET}</p></div>
+      <button id="NonceB" class="accordion">nonce</button>
+      <div id="NonceD" class="panel"><p>{NOUNCE}</p></div>
     </main>
     <script>
       var acc = document.getElementsByClassName("accordion");

@@ -2,10 +2,11 @@ function checkLogin(nonce) {
   $.get("/logins?nonce=" + nonce, function(data) {
     var login = JSON.parse(data);
     if (login.Nonce) {
-      // alert("Data Loaded: " + data);
-      $("#ticket").addClass("hidden");
       $("#qr").addClass("hidden");
-      $("#nonce").addClass("hidden");
+      $("#TicketB").addClass("hidden");
+      $("#TicketD").addClass("hidden");
+      $("#NonceB").addClass("hidden");
+      $("#NonceD").addClass("hidden");
 
       $("#LoginForm").removeClass("hidden");
 
@@ -40,7 +41,6 @@ function checkRegister(nonce) {
     var register = JSON.parse(data);
     console.log(register);
     if (register.Nonce) {
-      // alert("Data Loaded: " + data);
       $("#TicketB").addClass("hidden");
       $("#TicketD").addClass("hidden");
       $("#NonceB").addClass("hidden");
