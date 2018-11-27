@@ -7,29 +7,28 @@ function checkLogin(nonce) {
       $("#qr").addClass("hidden");
       $("#nonce").addClass("hidden");
 
-      $("#FirstName").removeClass("hidden");
+      $("#LoginForm").removeClass("hidden");
+
+      $("#GUID").text("GUID: " + login.GUID);
+      $("#LoginDate").text("Login Date: " + login.LoginDate);
+      $("#FirstName").text("First Name: " + login.FirstName);
+      $("#LastName").text("Last Name: " + login.LastName);
+      $("#Image").attr("src", "data:image/png;base64," + login.Image);
       if (login.CheckFirstName) {
         $("#FirstName").addClass("green");
       } else {
         $("#FirstName").addClass("red");
       }
-      $("#FirstName").text("First Name : " + login.FirstName);
-
-      $("#LastName").removeClass("hidden");
       if (login.CheckLastName) {
         $("#LastName").addClass("green");
       } else {
         $("#LastName").addClass("red");
       }
-      $("#LastName").text("Last Name : " + login.LastName);
-
-      $("#Image").removeClass("hidden");
-      if (login.CheckLastName) {
-        $("#Image").addClass("green");
+      if (login.CheckImage) {
+        $(".badge").attr("src", "images/true.png");
       } else {
-        $("#Image").addClass("red");
+        $(".badge").attr("src", "images/false.png");
       }
-      $("#Image").attr("src", "data:image/png;base64," + login.Image);
     } else {
       setTimeout(checkLogin, 1000, nonce);
     }
