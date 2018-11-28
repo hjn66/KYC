@@ -37,7 +37,7 @@ func RegisterWebService(webService WebService,
 	classicMartini.Get("/registerQR", webService.GetRegisterTicketQR)
 	classicMartini.Post("/registerQR", webService.PostRegisterTicketQR)
 	classicMartini.Post("/getticket", webService.GetTicketPost)
-	classicMartini.Get("/getticketQR", webService.GetTicketQR)
+	classicMartini.Get("/loginQR", webService.GetTicketQR)
 	classicMartini.Post("/login", webService.LoginPost)
 	classicMartini.Post("/checkfield", webService.CheckFieldPost)
 
